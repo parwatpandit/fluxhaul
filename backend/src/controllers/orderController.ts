@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import Order from '../models/Order';
 import Product from '../models/Product';
 import { AuthRequest } from '../middleware/authMiddleware';
+import { sendOrderStatusEmail } from '../services/emailService';
 
 // Create order
 export const createOrder = async (req: AuthRequest, res: Response): Promise<void> => {
@@ -124,11 +125,25 @@ export const updateOrderStatus = async (req: Request, res: Response): Promise<vo
       req.params.id,
       { status },
       { new: true }
-    );
+    ).populate('customer', 'name email');
+
     if (!order) {
       res.status(404).json({ message: 'Order not found' });
       return;
     }
+
+    try {
+      const customer = order.customer as any;
+      await sendOrderStatusEmail(
+        customer.email,
+        customer.name,
+        order._id.toString(),
+        order.status
+      );
+    } catch (emailError) {
+      console.error('Email send failed:', emailError);
+    }
+
     res.status(200).json(order);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
