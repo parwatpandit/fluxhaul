@@ -22,7 +22,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     user.refreshToken = refreshToken;
     await user.save();
 
-    res.status(201).json({ accessToken, refreshToken, role: user.role });
+    res.status(201).json({ accessToken, refreshToken, user: { _id: user._id, name: user.name, email: user.email, role: user.role } });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
   }
@@ -56,7 +56,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     user.refreshToken = refreshToken;
     await user.save();
 
-    res.status(200).json({ accessToken, refreshToken, role: user.role });
+    res.status(200).json({ accessToken, refreshToken, user: { _id: user._id, name: user.name, email: user.email, role: user.role } });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
   }

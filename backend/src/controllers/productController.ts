@@ -52,8 +52,9 @@ export const getProducts = async (req: Request, res: Response): Promise<void> =>
       pages: Math.ceil(total / limit),
     });
   } catch (error) {
+    console.log('CREATE PRODUCT ERROR:', error);
     res.status(500).json({ message: 'Server error', error });
-  }
+}
 };
 
 // Get single product

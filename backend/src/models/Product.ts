@@ -18,7 +18,7 @@ const ProductSchema = new Schema<IProduct>(
     price: { type: Number, required: true, min: 0 },
     category: { type: String, required: true },
     image: { type: String, default: '' },
-    warehouse: { type: Schema.Types.ObjectId, ref: 'Warehouse', required: true },
+    warehouse: { type: Schema.Types.ObjectId, ref: 'Warehouse', required: false },
     stock: { type: Number, required: true, min: 0 },
     threshold: { type: Number, required: true, default: 10 },
   },

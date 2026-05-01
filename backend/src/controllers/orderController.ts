@@ -12,9 +12,9 @@ export const createOrder = async (req: AuthRequest, res: Response): Promise<void
     const orderItems = [];
 
     for (const item of items) {
-      const product = await Product.findById(item.productId);
-      if (!product) {
-        res.status(404).json({ message: `Product ${item.productId} not found` });
+      const product = await Product.findById(item.product || item.productId);
+if (!product) {
+  res.status(404).json({ message: `Product ${item.product || item.productId} not found` });
         return;
       }
       if (product.stock < item.quantity) {
