@@ -203,3 +203,53 @@ export const updateDeliveryStatus = async (req: AuthRequest, res: Response): Pro
     res.status(500).json({ message: 'Server error', error });
   }
 };
+
+// Rate driver — customer
+export const rateDriver = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { rating } = req.body;
+
+    if (!rating || rating < 1 || rating > 5) {
+      res.status(400).json({ message: 'Rating must be between 1 and 5' });
+      return;
+    }
+
+    const order = await Order.findOne({
+      _id: req.params.id,
+      customer: req.user!.id,
+      status: 'delivered',
+      isRated: { $ne: true },
+    });
+
+    if (!order) {
+      res.status(404).json({ message: 'Order not found or already rated' });
+      return;
+    }
+
+    if (!order.driver) {
+      res.status(400).json({ message: 'No driver assigned to this order' });
+      return;
+    }
+
+    // Save rating to order
+    order.driverRating = rating;
+    order.isRated = true;
+    await order.save();
+
+    // Update driver average rating
+    const DriverProfile = (await import('../models/DriverProfile')).default;
+    const driverProfile = await DriverProfile.findOne({ user: order.driver });
+
+    if (driverProfile) {
+      const newTotal = driverProfile.totalRatings + 1;
+      const newRating = ((driverProfile.rating * driverProfile.totalRatings) + rating) / newTotal;
+      driverProfile.rating = Math.round(newRating * 10) / 10;
+      driverProfile.totalRatings = newTotal;
+      await driverProfile.save();
+    }
+
+    res.status(200).json({ message: 'Rating submitted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+};

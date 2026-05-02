@@ -15,6 +15,8 @@ export interface IOrder extends Document {
   trackingNumber: string;
   deliveryAddress: string;
   isPaid: boolean;
+  driverRating?: number;
+  isRated: boolean;
 }
 
 const OrderItemSchema = new Schema<IOrderItem>({
@@ -37,11 +39,12 @@ const OrderSchema = new Schema<IOrder>(
     trackingNumber: { type: String, unique: true },
     deliveryAddress: { type: String, required: true },
     isPaid: { type: Boolean, default: false },
+    driverRating: { type: Number, min: 1, max: 5 },
+    isRated: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
 
-// Generate unique tracking number
 OrderSchema.pre('save', function () {
   if (!this.trackingNumber) {
     this.trackingNumber = 'FH-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
