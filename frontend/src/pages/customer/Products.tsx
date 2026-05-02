@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Search, ShoppingCart, Filter, Plus, Minus } from "lucide-react";
+import { Search, ShoppingCart, Plus, Minus } from "lucide-react";
 import { getProductsApi } from "../../api/products";
 import { createOrderApi } from "../../api/orders";
 import toast from "react-hot-toast";

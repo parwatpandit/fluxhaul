@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: fluxhaul-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - MONGO_URI=mongodb://mongo:27017/fluxhaul
+      - JWT_ACCESS_SECRET=your_access_secret_here
+      - JWT_REFRESH_SECRET=your_refresh_secret_here
+      - REDIS_URL=redis://redis:6379
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASS=${EMAIL_PASS}
+    depends_on:
+      - mongo
+      - redis
+    networks:
+      - fluxhaul-network
+
+  frontend:
+    build: ./frontend
+    container_name: fluxhaul-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - fluxhaul-network
+
+  mongo:
+    image: mongo:7
+    container_name: fluxhaul-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - fluxhaul-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: fluxhaul-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - fluxhaul-network
+
+  ml-demand:
+    build: ./ml
+    container_name: fluxhaul-ml-demand
+    ports:
+      - "5001:5001"
+    networks:
+      - fluxhaul-network
+
+  ml-delay:
+    build: ./ml
+    container_name: fluxhaul-ml-delay
+    ports:
+      - "5002:5002"
+    networks:
+      - fluxhaul-network
+
+volumes:
+  mongo-data:
+
+networks:
+  fluxhaul-network:
+    driver: bridge

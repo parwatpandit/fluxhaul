@@ -11,7 +11,6 @@ import {
   Zap,
   LogOut,
   Menu,
-  X,
   ChevronRight,
 } from "lucide-react";
 import { useAuthStore } from "../../store/authStore";
