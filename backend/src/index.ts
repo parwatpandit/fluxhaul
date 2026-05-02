@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
 import connectDB from './config/db';
+import logger from './config/logger';
 import authRoutes from './routes/authRoutes';
 import warehouseRoutes from './routes/warehouseRoutes';
 import productRoutes from './routes/productRoutes';
@@ -35,7 +36,9 @@ const authLimiter = rateLimit({
 // Middleware
 app.use(cors());
 app.use(helmet());
-app.use(morgan('dev'));
+app.use(morgan('dev', {
+  stream: { write: (message: string) => logger.info(message.trim()) },
+}));
 app.use(express.json());
 app.use(globalLimiter);
 
@@ -56,7 +59,7 @@ app.get('/', (req, res) => {
 
 const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  logger.info(`Server running on port ${PORT}`);
 });
 
 export default app;
